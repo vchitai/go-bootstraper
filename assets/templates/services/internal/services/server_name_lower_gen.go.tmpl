@@ -1,0 +1,44 @@
+package services
+
+import (
+	"context"
+
+	"{{.domain_dash}}/{{.service_dash}}/pb"
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"google.golang.org/grpc"
+)
+
+type {{.serverNameCamel}}Interface interface {
+	{{ range .Protos }}
+	pb.{{.ProtoNameTitle}}Server
+	{{ end }}
+}
+
+type {{.serverNameCamel}}Server struct {
+	{{.serverNameCamel}}Interface
+}
+
+func new{{.ServerNameTitle}}Server(serverImpl {{.serverNameCamel}}Interface) ServiceServer {
+	return &{{.serverNameCamel}}Server{
+		{{.serverNameCamel}}Interface: serverImpl,
+	}
+}
+
+func (s *{{.serverNameCamel}}Server) RegisterWithServer(server *grpc.Server) {
+	{{ range .Protos }}
+	pb.Register{{.ProtoNameTitle}}Server(server, s)
+	{{ end }}
+}
+
+func (s *{{.serverNameCamel}}Server) RegisterWithHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
+	{{ range .Protos }}
+	if err := pb.Register{{.ProtoNameTitle}}Handler(ctx, mux, conn); err != nil {
+		return err
+	}
+	{{ end }}
+	return nil
+}
+
+// Close ...
+func (s *{{.serverNameCamel}}Server) Close(ctx context.Context) {
+}

@@ -1,0 +1,31 @@
+package services
+
+import (
+	"context"
+
+	"{{.domain_dash}}/{{.service_dash}}/configs"
+	"{{.domain_dash}}/{{.service_dash}}/pb"
+)
+
+var _ {{.serverNameCamel}}Interface = &{{.serverNameCamel}}Impl{}
+
+type {{.serverNameCamel}}Impl struct {
+	cfg *configs.Config
+}
+
+func New{{.ServerNameTitle}}(
+	cfg *configs.Config,
+) ServiceServer {
+	return new{{.ServerNameTitle}}Server(
+		&{{.serverNameCamel}}Impl{
+			cfg: cfg,
+		},
+	)
+}
+
+{{ range .Protos }}
+func (s {{.serverNameCamel}}Impl) Hello{{.ProtoNameTitle}}(ctx context.Context, req *pb.Hello{{.ProtoNameTitle}}Request) (*pb.Hello{{.ProtoNameTitle}}Response, error) {
+	return &pb.Hello{{.ProtoNameTitle}}Response{}, nil
+}
+
+{{ end }}
